@@ -1,42 +1,38 @@
 package selenium;
 
-import java.io.File;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class DriverFactory {
-    private static DriverFactory instance;
+public class Driver {
+    private static Driver instance;
     private WebDriver webDriver;
     private WebDriverWait webDriverWait;
     private Actions windowView;
 
-    private DriverFactory() {
+    private Driver() {
 
     }
 
-    public static DriverFactory getInstance() {
+    public static Driver getInstance() {
         if(instance == null) {
-            instance = new DriverFactory();
+            instance = new Driver();
         }
 
         return instance;
     }
 
-    private void configChrome(String osName) {
-        // Getting ChromeDriver
-        String pathToDriver = Paths.get("").toAbsolutePath().toString() + File.separator + "driver" + File.separator;
-        if (osName.equals("windows")) {
-            System.setProperty("webdriver.chrome.driver", pathToDriver + "chromedriver.exe");
-        } else {
-            System.setProperty("webdriver.chrome.driver", pathToDriver + "chromedriver");
-        }
+    private void configChrome(String driverPath) {
+        // Setting ChromeDriver
+        System.setProperty("webdriver.chrome.driver", driverPath);
 
         // Setting Notifications OFF
         Map<String, Object> prefs = new HashMap<String, Object>();
@@ -49,12 +45,10 @@ public class DriverFactory {
         webDriver.manage().window().maximize();
     }
 
-    public void setDriver(String browserType, int driverSecondsTimeout) {
-        String osName = (System.getProperty("os.name").toLowerCase().contains("mac") ? "mac" : "windows");
-
+    public void setDriver(String driverPath, String browserType, int driverSecondsTimeout) {
         switch (browserType) {
             case "chrome":
-                configChrome(osName);
+                configChrome(driverPath);
 
                 webDriverWait = new WebDriverWait(webDriver, driverSecondsTimeout);
                 windowView = new Actions(webDriver);
@@ -65,12 +59,12 @@ public class DriverFactory {
         }
     }
 
-    public WebDriver getWebDriver() {
-        return webDriver;
+    public WebElement findElement(By element) {
+        return webDriver.findElement(element);
     }
 
-    public WebDriverWait getWebDriverWait() {
-        return webDriverWait;
+    public WebElement waitUntilPresenceOf(By element) {
+        return webDriverWait.until(ExpectedConditions.presenceOfElementLocated(element));
     }
 
     public Actions getWindowView() {

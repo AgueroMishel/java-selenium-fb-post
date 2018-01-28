@@ -2,11 +2,12 @@ package main;
 
 import objects.facebook.Login;
 import objects.facebook.PostBox;
-import selenium.DriverFactory;
+import selenium.Driver;
 
 public class App {
     public static void main(String[] args) {
         // Arguments
+        String driverPath = "";
         String url = "https://www.facebook.com/";
         String email = "";
         String password = "";
@@ -17,11 +18,16 @@ public class App {
         int driverSecondsTimeout = 30;
 
         // Driver initialization
-        DriverFactory driver = DriverFactory.getInstance();
-        driver.setDriver(browser, driverSecondsTimeout);
+        Driver driver = Driver.getInstance();
+        driver.setDriver(driverPath, browser, driverSecondsTimeout);
 
+        // Go to Facebook, Signin and Post
         driver.goTo(url);
-        Login.signIn(email, password);
-        PostBox.post(message);
+
+        Login login = new Login();
+        login.signIn(email, password);
+
+        PostBox postBox = new PostBox();
+        postBox.post(message);
     }
 }
